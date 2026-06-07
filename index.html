@@ -614,7 +614,10 @@
     <!-- Mid Column: Securities Exchange -->
     <div class="mid-col">
       <div class="card" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-        <div class="card-title">Securities Exchange</div>
+        <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Securities Exchange</span>
+          <button class="btn-mini" style="border-color: var(--alert); color: var(--alert); cursor: pointer;" onclick="sellAllStocks()">Liquidate All</button>
+        </div>
         <div class="list-container" style="flex: 1;">
           <table>
             <thead>
@@ -629,9 +632,6 @@
               <!-- Rendered dynamically -->
             </tbody>
           </table>
-        </div>
-        <div style="margin-top: 12px; text-align: center;">
-          <button class="btn btn-danger" style="width: auto; padding: 6px 16px; font-size: 0.78rem;" onclick="sellAllStocks()">Liquidate All Positions</button>
         </div>
       </div>
     </div>
@@ -1070,19 +1070,25 @@
         return;
       }
 
-      const confirmed = confirm("WARNING: Are you sure you want to liquidate all security positions? This will sell all held units at current market prices.");
-      if (confirmed) {
-        let val = 0;
-        for(let key in stocks) { 
-          val += stocks[key].count * stocks[key].price; 
-          stocks[key].count = 0; 
-          document.getElementById("count_"+key).textContent = 0; 
-        }
-        money += val; 
-        calculateIncome(); 
-        updateHeaderMoney();
-        notify("Positions Liquidated", "All stock holdings have been liquidated successfully.", "positive");
+      document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    function executeLiquidation() {
+      closeConfirmModal();
+      let val = 0;
+      for(let key in stocks) { 
+        val += stocks[key].count * stocks[key].price; 
+        stocks[key].count = 0; 
+        document.getElementById("count_"+key).textContent = 0; 
       }
+      money += val; 
+      calculateIncome(); 
+      updateHeaderMoney();
+      notify("Positions Liquidated", "All stock holdings have been liquidated successfully.", "positive");
     }
 
     // --- Prestige System Logic ---
@@ -1364,5 +1370,19 @@
 
     init();
   </script>
+
+  <!-- Custom Confirm Modal -->
+  <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center;">
+    <div class="card" style="width: 380px; padding: 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); gap: 16px;">
+      <div style="font-size: 0.95rem; font-weight: 600; color: #fff;">Confirm Portfolio Liquidation</div>
+      <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin: 8px 0 12px 0;">
+        Are you sure you want to liquidate all security positions? This will sell all held units at current market prices immediately.
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn btn-secondary" onclick="closeConfirmModal()" style="width: auto; padding: 6px 12px; font-size: 0.78rem;">Cancel</button>
+        <button class="btn btn-danger" onclick="executeLiquidation()" style="width: auto; padding: 6px 16px; font-size: 0.78rem;">Confirm Sell</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
