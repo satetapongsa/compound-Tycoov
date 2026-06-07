@@ -492,20 +492,15 @@
   <header>
     <div style="display: flex; align-items: center; gap: 16px;">
       <div class="brand">Anmum <span>Ledger Systems</span></div>
-      <button class="btn btn-success" id="processBtn" onclick="clickProcess(event)" style="width: auto; padding: 6px 14px; font-size: 0.75rem; border-radius: 4px; display: inline-flex; align-items: center;">PROCESS</button>
     </div>
     <div class="status-bar">
-      <div class="status-item">
-        <span class="status-label">System Tier</span>
-        <span class="status-val val-primary" id="upgradeLevel">1</span>
-      </div>
       <div class="status-item">
         <span class="status-label">Net Yield / Sec <span id="eventAlert" class="event-active-label">SURGE</span></span>
         <span class="status-val val-success" id="income">+0.00 </span>
       </div>
       <div class="status-item">
         <span class="status-label">Ledger Balance</span>
-        <span class="status-val val-primary" id="money">1,000.00</span>
+        <span class="status-val val-primary" id="money">2,000.00</span>
       </div>
     </div>
   </header>
@@ -522,15 +517,7 @@
           <!-- Populated dynamically via JS -->
         </div>
 
-        <div style="padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.04); margin-top: 8px;">
-          <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px; color:var(--text-muted);">
-            <span>Operational Scale (Multiplier x<span id="miningMultDisplay">1</span>)</span>
-          </div>
-          <button class="btn btn-secondary" onclick="upgradeMining()">
-            <span>Optimize Scale</span>
-            <span>C$<span id="upgradeCostDisplay">500</span></span>
-          </button>
-        </div>
+
       </div>
 
       <!-- Tabs for upgrades and prestige -->
@@ -663,13 +650,8 @@
   </main>
 
   <script>
-    // --- State Variables ---
-    let money = 1000;
+    let money = 2000;
     let income = 0;
-    let clickPower = 1;
-    
-    let upgradeLevel = 1;
-    let upgradeCost = 500;
 
     // Endless Tycoon Assets Model
     let assets = {
@@ -897,8 +879,6 @@
     }
 
     function calculateIncome() {
-      const scaleMult = Math.pow(2, upgradeLevel - 1);
-      
       // Compute asset yields
       let baseYieldTotal = 0;
       for (let key in assets) {
@@ -920,31 +900,8 @@
       // Operational Leverage prestige bonus
       const prestigeMult = 1 + (prestige.upgrades.opLeverage || 0);
       
-      income = (baseYieldTotal + dividends) * scaleMult * eventMultiplier * prestigeMult;
+      income = (baseYieldTotal + dividends) * eventMultiplier * prestigeMult;
       document.getElementById("income").textContent = (income >= 0 ? "+" : "") + formatNumber(income);
-      
-      // Calculate manual click value
-      clickPower = 1 + (upgradeLevel * 2) + (assets.computeUnit.count * 0.5);
-    }
-
-    function clickProcess(e) {
-      money += clickPower;
-      updateHeaderMoney();
-      
-      const core = document.getElementById('processBtn');
-      const rect = core.getBoundingClientRect();
-      const float = document.createElement('div');
-      float.className = 'click-text';
-      float.textContent = '+C$' + formatNumber(clickPower);
-      
-      const offsetX = (Math.random() - 0.5) * 40;
-      const offsetY = (Math.random() - 0.5) * 40;
-      
-      float.style.left = (e.clientX + offsetX) + 'px';
-      float.style.top = (e.clientY + offsetY) + 'px';
-      
-      document.body.appendChild(float);
-      setTimeout(() => float.remove(), 800);
     }
 
     function buyAsset(key) {
@@ -954,18 +911,6 @@
         assets[key].count++;
         calculateIncome();
         renderAssets();
-        updateUI();
-        saveGame();
-      }
-    }
-    
-    function upgradeMining() {
-      if (money >= upgradeCost) {
-        money -= upgradeCost;
-        upgradeLevel++;
-        upgradeCost *= 5;
-        calculateIncome();
-        renderAssets(); // Re-render to update yield indicators
         updateUI();
         saveGame();
       }
@@ -1178,10 +1123,8 @@
       prestige.points += gainedEP;
 
       // Reset statistics
-      const startingCapital = 1000 + (prestige.upgrades.capital * 5000);
+      const startingCapital = 2000 + (prestige.upgrades.capital * 5000);
       money = startingCapital;
-      upgradeLevel = 1;
-      upgradeCost = 500;
       eventMultiplier = 1;
 
       // Reset asset counts
@@ -1271,10 +1214,6 @@
 
     // --- UI Rendering ---
     function updateUI() {
-      document.getElementById("upgradeLevel").textContent = upgradeLevel;
-      document.getElementById("miningMultDisplay").textContent = Math.pow(2, upgradeLevel - 1);
-      document.getElementById("upgradeCostDisplay").textContent = formatNumber(upgradeCost);
-
       updateLeaderboard();
     }
 
@@ -1309,7 +1248,7 @@
 
     // --- Persistent Storage ---
     function saveGame() {
-      const state = { money, upgradeLevel, upgradeCost, stocks, tech, prestige, assets };
+      const state = { money, stocks, tech, prestige, assets };
       localStorage.setItem('anmumCoreV3', JSON.stringify(state));
     }
     
@@ -1317,9 +1256,7 @@
       const s = localStorage.getItem('anmumCoreV3');
       if(s) {
         const d = JSON.parse(s);
-        money = d.money || 1000; 
-        upgradeLevel = d.upgradeLevel || 1; 
-        upgradeCost = d.upgradeCost || 500;
+        money = d.money || 2000;
         
         // Load assets safely
         if (d.assets) {
@@ -1354,11 +1291,9 @@
         const sOld = localStorage.getItem('anmumCoreV2');
         if (sOld) {
           const dOld = JSON.parse(sOld);
-          money = dOld.money || 1000;
+          money = dOld.money || 2000;
           assets.computeUnit.count = dOld.businessCount || 0;
           assets.dataCenter.count = dOld.propertyCount || 0;
-          upgradeLevel = dOld.upgradeLevel || 1;
-          upgradeCost = dOld.upgradeCost || 500;
           if (dOld.stocks) {
             for(let k in dOld.stocks) {
               if(stocks[k]) { 
