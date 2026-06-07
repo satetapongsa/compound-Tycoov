@@ -1,465 +1,402 @@
 <!DOCTYPE html>
-<html lang="th">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Anmum Company</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
-    rel="stylesheet">
-
-  <!-- Bootstrap & Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-  <!-- Chart.js -->
+  <title>Anmum Core | Galactic Syndicate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
     :root {
-      --primary: #00f2ff;
-      --secondary: #7000ff;
-      --accent: #ff00c8;
-      --bg: #050510;
-      --card-bg: rgba(255, 255, 255, 0.05);
-      --border: rgba(255, 255, 255, 0.1);
-      --text: #e0e0e0;
+      --bg: #030305;
+      --panel-bg: rgba(10, 15, 30, 0.7);
+      --primary: #00f3ff;
+      --secondary: #bc13fe;
+      --alert: #ff2a2a;
       --success: #00ff88;
+      --warning: #ffb700;
+      --text: #e0eaf5;
+      --border: rgba(0, 243, 255, 0.2);
+      --glow-primary: 0 0 10px rgba(0, 243, 255, 0.6), 0 0 20px rgba(0, 243, 255, 0.4);
+      --glow-secondary: 0 0 10px rgba(188, 19, 254, 0.6), 0 0 20px rgba(188, 19, 254, 0.4);
+      --glow-alert: 0 0 10px rgba(255, 42, 42, 0.6);
     }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
     body {
       background-color: var(--bg);
-      background-image:
-        radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(112, 0, 255, 0.05) 0%, transparent 40%);
+      background-image: 
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
       color: var(--text);
-      font-family: 'Outfit', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
-
-    .glass-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      height: 100%;
-    }
-
-    .glass-card:hover {
-      border-color: rgba(0, 242, 255, 0.3);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5 {
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .glow-text {
-      color: var(--primary);
-      text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-    }
-
-    .stat-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-    }
-
-    .btn-premium {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border: none;
-      color: white;
-      font-weight: 600;
-      border-radius: 12px;
-      padding: 10px 20px;
-      transition: all 0.3s ease;
-      position: relative;
+      font-family: 'Rajdhani', sans-serif;
+      height: 100vh;
       overflow: hidden;
-    }
-
-    .btn-premium:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4);
-      color: white;
-    }
-
-    .btn-outline-premium {
-      background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-      border-radius: 12px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .btn-outline-premium:hover {
-      background: var(--primary);
-      color: var(--bg);
-    }
-
-    /* Calculator Styles */
-    #calc-floating {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      width: 320px;
-      z-index: 1000;
-      background: rgba(10, 10, 20, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--primary);
-      border-radius: 20px;
-      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
-      padding: 1.5rem;
-      display: none;
-    }
-
-    #calc-toggle {
       display: flex;
+      flex-direction: column;
+    }
+
+    /* HUD Header */
+    header {
+      border-bottom: 1px solid var(--primary);
+      box-shadow: var(--glow-primary);
+      background: linear-gradient(180deg, rgba(0, 243, 255, 0.1) 0%, transparent 100%);
+      padding: 10px 30px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: rgba(0, 242, 255, 0.1);
-      border: 1px solid var(--primary);
+      z-index: 10;
+    }
+
+    .brand {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 900;
       color: var(--primary);
-      padding: 8px 15px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
-      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: var(--glow-primary);
     }
 
-    #calc-toggle:hover {
-      background: var(--primary);
-      color: var(--bg);
-      box-shadow: 0 0 15px var(--primary);
-    }
+    .status-bar { display: flex; gap: 30px; }
+    .status-item { display: flex; flex-direction: column; align-items: flex-end; }
+    .status-label { font-size: 0.7rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+    .status-val { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; transition: color 0.3s, text-shadow 0.3s; }
+    
+    .val-primary { color: var(--primary); text-shadow: var(--glow-primary); }
+    .val-secondary { color: var(--secondary); text-shadow: var(--glow-secondary); }
+    .val-success { color: var(--success); text-shadow: 0 0 10px rgba(0,255,136,0.5); }
+    .val-alert { color: var(--alert); text-shadow: var(--glow-alert); }
 
-    /* Animations */
-    @keyframes floatUp {
-      0% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-
-      100% {
-        transform: translateY(-50px);
-        opacity: 0;
-      }
-    }
-
-    .money-float {
-      position: fixed;
-      pointer-events: none;
-      color: var(--success);
-      font-weight: 700;
-      z-index: 9999;
-      animation: floatUp 1s ease-out forwards;
-    }
-
-    .chart-container {
-      position: relative;
-      height: 220px;
-      width: 100%;
+    /* Main Grid */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 350px;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
       overflow: hidden;
     }
 
-    .nav-stats {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(5, 5, 16, 0.8);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 0;
-    }
+    .left-col { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; gap: 20px; }
+    .mid-col { grid-column: 2; grid-row: 1 / 3; display: flex; flex-direction: column; gap: 20px; }
+    .charts { grid-column: 3; grid-row: 1; }
+    .leaderboard { grid-column: 3; grid-row: 2; }
 
-    .progress {
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .progress-bar {
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-    }
-
-    table {
-      border-collapse: separate;
-      border-spacing: 0 8px;
-    }
-
-    tr {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 8px;
-    }
-
-    td,
-    th {
-      padding: 12px !important;
-      border: none !important;
-    }
-
-    tr.highlight {
-      background: rgba(0, 242, 255, 0.1) !important;
-      border-left: 4px solid var(--primary);
-    }
-
-    .form-control {
-      background: rgba(0, 0, 0, 0.3);
+    /* Panels */
+    .panel {
+      background: var(--panel-bg);
       border: 1px solid var(--border);
-      color: white;
-      border-radius: 10px;
+      border-radius: 4px;
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
     }
 
-    .form-control:focus {
-      background: rgba(0, 0, 0, 0.5);
-      border-color: var(--primary);
-      box-shadow: none;
-      color: white;
+    .panel::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 10px; height: 10px;
+      border-top: 2px solid var(--primary); border-left: 2px solid var(--primary);
+    }
+    .panel::after {
+      content: ''; position: absolute; bottom: 0; right: 0; width: 10px; height: 10px;
+      border-bottom: 2px solid var(--primary); border-right: 2px solid var(--primary);
     }
 
-    .badge-premium {
-      background: rgba(0, 242, 255, 0.2);
+    .panel-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
       color: var(--primary);
-      padding: 5px 10px;
-      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(0,243,255,0.2);
+      padding-bottom: 5px;
+    }
+
+    /* Buttons */
+    .btn {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-family: 'Orbitron', sans-serif;
+      padding: 8px 12px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      width: 100%;
       font-size: 0.8rem;
     }
+    .btn:hover:not(:disabled) { background: rgba(0, 243, 255, 0.15); box-shadow: inset 0 0 15px rgba(0,243,255,0.3), var(--glow-primary); }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn:disabled { border-color: #555; color: #555; cursor: not-allowed; text-shadow: none; box-shadow: none; }
+    
+    .btn-secondary { border-color: var(--secondary); color: var(--secondary); }
+    .btn-secondary:hover:not(:disabled) { background: rgba(188, 19, 254, 0.15); box-shadow: inset 0 0 15px rgba(188, 19, 254, 0.3), var(--glow-secondary); }
 
-    #income-display {
-      font-size: 1.1rem;
-      opacity: 0.8;
+    .btn-alert { border-color: var(--alert); color: var(--alert); }
+    .btn-alert:hover:not(:disabled) { background: rgba(255, 42, 42, 0.15); box-shadow: inset 0 0 15px rgba(255, 42, 42, 0.3), var(--glow-alert); }
+
+    /* Market Table */
+    table { width: 100%; border-collapse: collapse; font-family: 'Rajdhani', sans-serif; }
+    th { text-align: left; font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: rgba(255,255,255,0.4); border-bottom: 1px solid var(--border); padding: 5px; }
+    td { padding: 8px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+    .stock-symbol { font-weight: 700; color: #fff; font-size: 1rem; }
+    .stock-name { font-size: 0.7rem; color: rgba(255,255,255,0.5); }
+    .stock-price { font-family: 'Orbitron', sans-serif; color: var(--primary); text-shadow: var(--glow-primary); transition: all 0.3s; font-size: 0.9rem; }
+    .action-group { display: flex; gap: 5px; justify-content: flex-end; }
+    
+    .btn-mini { padding: 3px 8px; font-size: 0.6rem; border: 1px solid; background: transparent; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: 700; transition: all 0.2s; }
+    .btn-mini.buy { border-color: var(--primary); color: var(--primary); }
+    .btn-mini.buy:hover { background: rgba(0,243,255,0.2); box-shadow: var(--glow-primary); }
+    .btn-mini.sell { border-color: var(--alert); color: var(--alert); }
+    .btn-mini.sell:hover { background: rgba(255,42,42,0.2); box-shadow: var(--glow-alert); }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
+
+    /* Hacking Core */
+    .core-container {
+      flex: 0 0 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
     }
+    .hack-core {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,243,255,0.8) 0%, rgba(0,243,255,0.1) 70%, transparent 100%);
+      box-shadow: 0 0 30px rgba(0,243,255,0.6), inset 0 0 20px rgba(255,255,255,0.8);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      color: #030305;
+      text-transform: uppercase;
+      font-size: 1.2rem;
+      border: 2px solid #fff;
+      transition: transform 0.1s;
+      animation: pulse 2s infinite;
+    }
+    .hack-core:active { transform: scale(0.9); box-shadow: 0 0 50px rgba(0,243,255,1), inset 0 0 30px rgba(255,255,255,1); }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 30px rgba(0,243,255,0.6), inset 0 0 20px rgba(255,255,255,0.8); }
+      50% { box-shadow: 0 0 50px rgba(0,243,255,0.8), inset 0 0 20px rgba(255,255,255,1); }
+      100% { box-shadow: 0 0 30px rgba(0,243,255,0.6), inset 0 0 20px rgba(255,255,255,0.8); }
+    }
+    .click-text {
+      position: absolute;
+      color: var(--success);
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0,255,136,0.8);
+      pointer-events: none;
+      animation: floatUp 1s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-50px) scale(1.5); }
+    }
+
+    /* Notifications */
+    #notification-area {
+      position: fixed; top: 80px; right: 20px; z-index: 1000;
+      display: flex; flex-direction: column; gap: 10px; width: 300px;
+    }
+    .toast-msg {
+      background: rgba(10, 15, 30, 0.9);
+      border-left: 4px solid var(--primary);
+      padding: 15px;
+      border-radius: 4px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      animation: slideIn 0.3s ease-out forwards;
+      font-family: 'Rajdhani', sans-serif;
+    }
+    .toast-msg.negative { border-left-color: var(--alert); }
+    .toast-msg.positive { border-left-color: var(--success); }
+    .toast-title { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; }
+    .toast-body { font-size: 0.85rem; color: #ccc; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+    /* Misc */
+    .chart-container { flex: 1; position: relative; min-height: 0; }
+    .leaderboard-list { overflow-y: auto; flex: 1; padding-right: 5px; }
+    .rank-row { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s; font-size: 0.9rem; }
+    .rank-row.highlight { background: rgba(0,243,255,0.1); border-left: 2px solid var(--primary); }
+    
+    .event-active-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem; color: var(--warning);
+      text-shadow: 0 0 5px var(--warning);
+      animation: blink 1s infinite;
+      display: none;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
   </style>
 </head>
+<body>
 
-<body class="p-0">
-
-  <!-- Header Stats -->
-  <header class="nav-stats">
-    <div class="container-fluid px-4">
-      <div class="row align-items-center">
-        <div class="col-md-3">
-          <h3 class="m-0"><span style="color: var(--primary)">Anmum</span> Group</h3>
-        </div>
-        <div class="col-md-5 text-center">
-          <div class="d-inline-block mx-3">
-            <span class="small opacity-50 text-uppercase tracking-wider">Balance</span>
-            <div class="h4 m-0 glow-text">$<span id="money" class="stat-value">1,000.00</span></div>
-          </div>
-          <div class="d-inline-block mx-3">
-            <span class="small opacity-50 text-uppercase tracking-wider">Net / Sec</span>
-            <div class="h5 m-0 text-success">$+<span id="income" class="stat-value">0.00</span></div>
-          </div>
-        </div>
-        <div class="col-md-4 d-flex justify-content-end align-items-center gap-3">
-          <span class="badge-premium"><i class="fas fa-crown me-1"></i> Level <span id="upgradeLevel">1</span> <span class="text-success ms-1 small">(x<span id="miningMultDisplay">1</span> Multiplier)</span></span>
-          <div id="calc-toggle" onclick="toggleCalc()">
-            <i class="fas fa-calculator me-2"></i> CALCULATOR
-          </div>
-        </div>
+  <header>
+    <div class="brand">Anmum // Core</div>
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-label">Network Level</span>
+        <span class="status-val val-secondary" id="upgradeLevel">1</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Net / Sec <span id="eventAlert" class="event-active-label">[EVENT ACTIVE]</span></span>
+        <span class="status-val val-success" id="income">+0.00 </span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Total Credits</span>
+        <span class="status-val val-primary" id="money">1,000.00</span>
       </div>
     </div>
   </header>
 
-  <main class="container-fluid py-4 px-4">
-    <div class="row g-4">
-      <!-- LEFT COLUMN: Shops & Markets -->
-      <div class="col-lg-7">
-        <div class="row g-4">
-          <div class="col-md-5">
-            <div class="glass-card mb-4">
-              <h5 class="mb-4"><i class="fas fa-store me-2 text-primary"></i> Assets</h5>
-              <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                  <span class="small">Business (x<span id="businessCount">0</span>)</span>
-                </div>
-                <button class="btn btn-premium btn-sm w-100" onclick="buyBusiness()">Buy ($<span id="businessPriceDisplay">50</span>)</button>
-              </div>
-              <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                  <span class="small">Property (x<span id="propertyCount">0</span>)</span>
-                </div>
-                <button class="btn btn-premium btn-sm w-100" onclick="buyProperty()">Buy ($<span id="propertyPriceDisplay">200</span>)</button>
-              </div>
-              <div>
-                <div class="d-flex justify-content-between mb-1">
-                  <span class="small">Upgrade (Level <span id="miningLevelDisplay">1</span>)</span>
-                </div>
-                <button class="btn btn-outline-premium btn-sm w-100" onclick="upgradeMining()">Fast-Track ($<span id="upgradeCostDisplay">500</span>)</button>
-              </div>
-            </div>
-            <div class="glass-card">
-              <h5 class="mb-3"><i class="fas fa-wallet me-2 text-primary"></i> Portfolio</h5>
-              <div id="income-details" class="small opacity-75"></div>
-            </div>
-          </div>
+  <div id="notification-area"></div>
 
-          <div class="col-md-7">
-            <div class="glass-card h-100">
-              <h5 class="mb-4 d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-landmark me-2 text-primary"></i> Stock Market</span>
-                <span class="badge bg-success small" style="font-size: 0.6rem;">LIVE</span>
-              </h5>
-              <div class="table-responsive">
-                <table class="table table-dark table-sm w-100 align-middle">
-                  <thead>
-                    <tr class="opacity-50 small">
-                      <th>SYMBOL</th>
-                      <th>PRICE</th>
-                      <th>OWNED</th>
-                      <th class="text-end">ACTION</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>WV-BK</strong><br><span class="opacity-50" style="font-size:0.7rem">Anmum Company</span></td>
-                      <td class="text-primary font-monospace">$<span id="wavyBankPrice">49.00</span></td>
-                      <td class="font-monospace"><span id="wavyBankCount">0</span> <span class="badge bg-secondary opacity-50" style="font-size:0.6rem">5% Yield</span></td>
-                      <td class="text-end">
-                        <div class="d-flex justify-content-end gap-1">
-                          <button class="btn btn-xs btn-outline-primary" style="font-size:0.6rem; padding: 2px 5px;" onclick="buyStock('wavyBank')">BUY</button>
-                          <button class="btn btn-xs btn-outline-danger" style="font-size:0.6rem; padding: 2px 5px;" onclick="sellStock('wavyBank')">SELL</button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong>WV-CO</strong><br><span class="opacity-50" style="font-size:0.7rem">Anmum Group</span></td>
-                      <td class="text-primary font-monospace">$<span id="wavyCompanyPrice">500.00</span></td>
-                      <td class="font-monospace"><span id="wavyCompanyCount">0</span> <span class="badge bg-secondary opacity-50" style="font-size:0.6rem">5% Yield</span></td>
-                      <td class="text-end">
-                        <div class="d-flex justify-content-end gap-1">
-                          <button class="btn btn-xs btn-outline-primary" style="font-size:0.6rem; padding: 2px 5px;" onclick="buyStock('wavyCompany')">BUY</button>
-                          <button class="btn btn-xs btn-outline-danger" style="font-size:0.6rem; padding: 2px 5px;" onclick="sellStock('wavyCompany')">SELL</button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong>WV-TC</strong><br><span class="opacity-50" style="font-size:0.7rem">Wavy Tech</span></td>
-                      <td class="text-primary font-monospace">$<span id="moonTechPrice">1000.00</span></td>
-                      <td class="font-monospace"><span id="moonTechCount">0</span> <span class="badge bg-secondary opacity-50" style="font-size:0.6rem">5% Yield</span></td>
-                      <td class="text-end">
-                        <div class="d-flex justify-content-end gap-1">
-                          <button class="btn btn-xs btn-outline-primary" style="font-size:0.6rem; padding: 2px 5px;" onclick="buyStock('moonTech')">BUY</button>
-                          <button class="btn btn-xs btn-outline-danger" style="font-size:0.6rem; padding: 2px 5px;" onclick="sellStock('moonTech')">SELL</button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong>WV-SP</strong><br><span class="opacity-50" style="font-size:0.7rem">Wavy Space</span></td>
-                      <td class="text-primary font-monospace">$<span id="wavySpacePrice">2500.00</span></td>
-                      <td class="font-monospace"><span id="wavySpaceCount">0</span> <span class="badge bg-secondary opacity-50" style="font-size:0.6rem">5% Yield</span></td>
-                      <td class="text-end">
-                        <div class="d-flex justify-content-end gap-1">
-                          <button class="btn btn-xs btn-outline-primary" style="font-size:0.6rem; padding: 2px 5px;" onclick="buyStock('wavySpace')">BUY</button>
-                          <button class="btn btn-xs btn-outline-danger" style="font-size:0.6rem; padding: 2px 5px;" onclick="sellStock('wavySpace')">SELL</button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong>WV-EN</strong><br><span class="opacity-50" style="font-size:0.7rem">Wavy Energy</span></td>
-                      <td class="text-primary font-monospace">$<span id="wavyEnergyPrice">5000.00</span></td>
-                      <td class="font-monospace"><span id="wavyEnergyCount">0</span> <span class="badge bg-secondary opacity-50" style="font-size:0.6rem">5% Yield</span></td>
-                      <td class="text-end">
-                        <div class="d-flex justify-content-end gap-1">
-                          <button class="btn btn-xs btn-outline-primary" style="font-size:0.6rem; padding: 2px 5px;" onclick="buyStock('wavyEnergy')">BUY</button>
-                          <button class="btn btn-xs btn-outline-danger" style="font-size:0.6rem; padding: 2px 5px;" onclick="sellStock('wavyEnergy')">SELL</button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="mt-2 text-center">
-                <button class="btn btn-link text-danger text-decoration-none btn-sm" onclick="sellAllStocks()">Liquidate Stocks</button>
-              </div>
-            </div>
+  <main>
+    <!-- Left Column: Infra & Tech -->
+    <div class="left-col">
+      <div class="panel" style="flex: 1;">
+        <div class="panel-title">[SYS] Infrastructure</div>
+        
+        <div style="margin-bottom: 15px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:5px;">
+            <span>Data Nodes [<span id="businessCount">0</span>]</span>
           </div>
+          <button class="btn" onclick="buyBusiness()">
+            <span>Install Node</span>
+            <span>C$<span id="businessPriceDisplay">50</span></span>
+          </button>
         </div>
 
-        <div class="glass-card mt-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0"><i class="fas fa-trophy me-2 text-warning"></i> Global Leaderboard</h5>
+        <div style="margin-bottom: 15px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:5px;">
+            <span>Server Farms [<span id="propertyCount">0</span>]</span>
           </div>
-          <div class="table-responsive">
-            <table class="table table-dark table-sm">
-              <tbody id="leaderboardBody"></tbody>
-            </table>
+          <button class="btn" onclick="buyProperty()">
+            <span>Construct Farm</span>
+            <span>C$<span id="propertyPriceDisplay">200</span></span>
+          </button>
+        </div>
+
+        <div style="margin-top: auto;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:5px; color:var(--secondary);">
+            <span>Core Overclock (Multiplier x<span id="miningMultDisplay">1</span>)</span>
           </div>
+          <button class="btn btn-secondary" onclick="upgradeMining()">
+            <span>OVERCLOCK SYS</span>
+            <span>C$<span id="upgradeCostDisplay">500</span></span>
+          </button>
         </div>
       </div>
 
-      <div class="col-lg-5">
-        <div class="d-flex flex-column gap-4">
-          <div class="glass-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="m-0"><i class="fas fa-chart-line me-2 text-primary"></i> Performance Matrix</h5>
-              <span class="badge bg-secondary opacity-50" style="font-size:0.6rem">10s Interval</span>
+      <div class="panel" style="flex: 1;">
+        <div class="panel-title">[RES] Tech Upgrades</div>
+        <div style="overflow-y: auto; flex: 1; padding-right: 5px;">
+          
+          <button class="btn" id="btnTechQuantum" onclick="buyTech('quantum')">
+            <div style="text-align:left; display:flex; flex-direction:column;">
+              <span style="font-size:0.7rem;">Quantum Cooling</span>
+              <span style="font-size:0.6rem; color:#aaa; font-family:'Rajdhani'; text-transform:none;">Nodes Output x2</span>
             </div>
-            <div class="chart-container">
-              <canvas id="mainChart"></canvas>
+            <span>C$1,000</span>
+          </button>
+
+          <button class="btn btn-secondary" id="btnTechAI" onclick="buyTech('aiTrader')">
+            <div style="text-align:left; display:flex; flex-direction:column;">
+              <span style="font-size:0.7rem;">AI Trader Alg.</span>
+              <span style="font-size:0.6rem; color:#aaa; font-family:'Rajdhani'; text-transform:none;">Stock Yield +50%</span>
             </div>
-          </div>
-          <div class="glass-card">
-            <h5 class="mb-3"><i class="fas fa-history me-2 text-primary"></i> Asset Growth (Capital)</h5>
-            <div class="chart-container">
-              <canvas id="growthChart"></canvas>
+            <span>C$2,500</span>
+          </button>
+
+          <button class="btn btn-alert" id="btnTechFirewall" style="border-color:var(--success); color:var(--success);" onclick="buyTech('firewall')">
+            <div style="text-align:left; display:flex; flex-direction:column;">
+              <span style="font-size:0.7rem;">ICE Firewall</span>
+              <span style="font-size:0.6rem; color:#aaa; font-family:'Rajdhani'; text-transform:none;">Blocks Negative Events</span>
             </div>
-          </div>
-          <div class="glass-card p-3 d-flex justify-content-between align-items-center">
-            <button class="btn btn-sm btn-outline-danger" onclick="resetGame()">Factory Reset</button>
-          </div>
+            <span>C$5,000</span>
+          </button>
+
         </div>
       </div>
     </div>
+
+    <!-- Mid Column: Clicker & Market -->
+    <div class="mid-col">
+      <div class="panel core-container">
+        <div class="panel-title" style="position:absolute; top:15px; left:15px; border:none;">[ACT] Hacking Core</div>
+        <div class="hack-core" id="hackCore" onclick="clickCore(event)">HACK</div>
+      </div>
+
+      <div class="panel" style="flex:1;">
+        <div class="panel-title">[EXG] Galactic Exchange</div>
+        <div style="overflow-y:auto; flex:1; padding-right:5px;">
+          <table>
+            <thead>
+              <tr>
+                <th>ASSET</th>
+                <th>PRICE</th>
+                <th>HELD</th>
+                <th style="text-align:right;">ORDER</th>
+              </tr>
+            </thead>
+            <tbody id="stockTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top: 15px; text-align: center;">
+          <button class="btn btn-alert" style="width: auto; padding: 5px 20px; font-size: 0.8rem;" onclick="sellAllStocks()">LIQUIDATE ALL ASSETS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Charts & Leaderboard -->
+    <div class="panel charts">
+      <div class="panel-title">[DAT] Performance Matrix</div>
+      <div class="chart-container">
+        <canvas id="mainChart"></canvas>
+      </div>
+    </div>
+
+    <div class="panel leaderboard">
+      <div class="panel-title" style="display:flex; justify-content:space-between;">
+        <span>[NET] Global Ledger</span>
+        <button class="btn-mini sell" style="cursor:pointer;" onclick="resetGame()">RESET</button>
+      </div>
+      <div class="leaderboard-list" id="leaderboardBody"></div>
+    </div>
+
   </main>
-
-  <!-- Compound Interest Calculator Modal -->
-  <div id="calc-floating">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="m-0 text-primary"><i class="fas fa-calculator me-2"></i> Investment Planner</h5>
-      <i class="fas fa-times cursor-pointer" onclick="toggleCalc()"></i>
-    </div>
-    <div class="mb-2">
-      <label class="small opacity-50">Principal ($)</label>
-      <input type="number" id="calc-p" class="form-control form-control-sm" value="1000">
-    </div>
-    <div class="mb-2">
-      <label class="small opacity-50">Annual Interest (%)</label>
-      <input type="number" id="calc-r" class="form-control form-control-sm" value="5">
-    </div>
-    <div class="row mb-2">
-      <div class="col">
-        <label class="small opacity-50">Years</label>
-        <input type="number" id="calc-t" class="form-control form-control-sm" value="5">
-      </div>
-      <div class="col">
-        <label class="small opacity-50">Compound/Yr</label>
-        <input type="number" id="calc-n" class="form-control form-control-sm" value="12">
-      </div>
-    </div>
-    <div class="p-3 mt-3 text-center" style="background: rgba(0,242,255,0.1); border-radius: 12px; border: 1px solid rgba(0,242,255,0.2);">
-      <span class="small opacity-75">Future Value:</span><br>
-      <h4 class="glow-text m-0">$<span id="calc-res">1283.36</span></h4>
-    </div>
-  </div>
-
 
   <script>
     // --- Game State ---
     let money = 1000;
     let income = 0;
+    let clickPower = 1;
+    
     let businessCount = 0;
     let propertyCount = 0;
     let upgradeLevel = 1;
@@ -468,74 +405,107 @@
     const businessPrice = 50;
     const propertyPrice = 200;
 
-    let wavyBankCount = 0;
-    let wavyCompanyCount = 0;
-    let moonTechCount = 0;
-    let wavySpaceCount = 0;
-    let wavyEnergyCount = 0;
+    let stocks = {
+      wavyBank: { name: "Quantum Bank", count: 0, price: 49, yield: 0.05, symbol: "Q-BNK" },
+      wavyCompany: { name: "Hyper Group", count: 0, price: 500, yield: 0.05, symbol: "H-GRP" },
+      moonTech: { name: "Astro Tech", count: 0, price: 1000, yield: 0.05, symbol: "A-TEC" },
+      wavySpace: { name: "Nova Space", count: 0, price: 2500, yield: 0.05, symbol: "N-SPC" },
+      wavyEnergy: { name: "Plasma Energy", count: 0, price: 5000, yield: 0.05, symbol: "P-ENG" }
+    };
 
-    let stockPrices = { wavyBank: 49, wavyCompany: 500, moonTech: 1000, wavySpace: 2500, wavyEnergy: 5000 };
-    const dividendRates = { business: 0.1, property: 0.15, wavyBank: 0.05, wavyCompany: 0.05, moonTech: 0.05, wavySpace: 0.05, wavyEnergy: 0.05 };
+    let tech = {
+      quantum: { owned: false, cost: 1000 },
+      aiTrader: { owned: false, cost: 2500 },
+      firewall: { owned: false, cost: 5000 }
+    };
 
-    const playerName = "ME (YOU)";
+    let eventMultiplier = 1; // Used for random events modifying income
+
+    const playerName = "USER_SYS";
     let leaderboard = [
-      { name: "Anmum Company", asset: 999999999999 }, { name: "Wavy Galactic", asset: 512456793 },
-      { name: "Choky Capital", asset: 412546379 }, { name: "S&P500", asset: 354976123 },
-      { name: "Neural Link", asset: 254976124 }, { name: "Meta", asset: 1200000 } , { name: "NVDA", asset: 354976123 }, { name: "TSLA", asset: 354976123 }
+      { name: "Anmum Core", asset: 999999999999 }, { name: "Galactic Fed", asset: 512456793 },
+      { name: "Cyberdyne", asset: 412546379 }, { name: "Weyland-Yutani", asset: 354976123 },
+      { name: "Tyrell Corp", asset: 254976124 }, { name: "Stark Ind", asset: 1200000 },
+      { name: "Omni Cons", asset: 800000 }, { name: "CHOAM", asset: 450000 }
     ];
 
+    Chart.defaults.color = 'rgba(255, 255, 255, 0.4)';
+    Chart.defaults.font.family = 'Orbitron';
+    
     // --- Initialization ---
-
     function init() {
       loadGame();
+      renderStockTable();
+      updateTechUI();
       setupCharts();
       updateUI();
 
+      // Income loop
       setInterval(() => {
         calculateIncome();
         money += income / 10;
-        document.getElementById("money").textContent = money.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        updateHeaderMoney();
       }, 100);
 
+      // Simulation loop
       let tickCount = 0;
       setInterval(() => {
         tickCount++;
         if (tickCount % 2 === 0) simulateStocks();
-        if (tickCount % 1 === 0) saveGame(); 
-        if (tickCount % 10 === 0) { // Every 10s for graphs
-          updateUI();
-          updateChartsData();
-        }
+        if (tickCount % 2 === 0) saveGame(); 
+        if (tickCount % 3 === 0) updateChartsData();
+        if (tickCount % 45 === 0) triggerRandomEvent(); // Every 45 seconds roll an event
       }, 1000);
-
-      ['calc-p', 'calc-r', 'calc-t', 'calc-n'].forEach(id => {
-        document.getElementById(id).addEventListener('input', calculateCompound);
-      });
-      calculateCompound();
     }
 
-    function simulateStocks() {
-      for (const stock in stockPrices) {
-        const change = (Math.random() - 0.48) * (stockPrices[stock] * 0.05);
-        stockPrices[stock] = Math.max(1, stockPrices[stock] + change);
-        document.getElementById(stock + "Price").textContent = stockPrices[stock].toFixed(2);
-      }
+    // --- Core Logic ---
+    function updateHeaderMoney() {
+      const el = document.getElementById("money");
+      el.textContent = money.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
-
-    // --- Logic ---
 
     function calculateIncome() {
       const mult = Math.pow(2, upgradeLevel - 1);
-      const base = (businessCount * businessPrice * dividendRates.business / 10) +
-                   (propertyCount * propertyPrice * dividendRates.property / 10);
       
-      const dividends = (wavyBankCount * stockPrices.wavyBank * dividendRates.wavyBank / 10) +
-                        (wavyCompanyCount * stockPrices.wavyCompany * dividendRates.wavyCompany / 10) +
-                        (moonTechCount * stockPrices.moonTech * dividendRates.moonTech / 10) +
-                        (wavySpaceCount * stockPrices.wavySpace * dividendRates.wavySpace / 10) +
-                        (wavyEnergyCount * stockPrices.wavyEnergy * dividendRates.wavyEnergy / 10);
+      let nodeBonus = tech.quantum.owned ? 2 : 1;
+      let stockBonus = tech.aiTrader.owned ? 1.5 : 1;
+
+      const base = (businessCount * businessPrice * 0.1 * nodeBonus / 10) +
+                   (propertyCount * propertyPrice * 0.15 / 10);
       
-      income = (base + dividends) * mult;
+      let dividends = 0;
+      for(let key in stocks) {
+        dividends += (stocks[key].count * stocks[key].price * (stocks[key].yield * stockBonus) / 10);
+      }
+      
+      income = (base + dividends) * mult * eventMultiplier;
+      document.getElementById("income").textContent = (income >= 0 ? "+" : "") + income.toLocaleString(undefined, {minimumFractionDigits: 2});
+      
+      // Update click power based on network level and nodes
+      clickPower = 1 + (upgradeLevel * 2) + (businessCount * 0.5);
+    }
+
+    function clickCore(e) {
+      money += clickPower;
+      updateHeaderMoney();
+      
+      // Create float text
+      const core = document.getElementById('hackCore');
+      const rect = core.getBoundingClientRect();
+      const float = document.createElement('div');
+      float.className = 'click-text';
+      float.textContent = '+C$' + clickPower.toFixed(1);
+      
+      // Randomize position slightly
+      const offsetX = (Math.random() - 0.5) * 40;
+      const offsetY = (Math.random() - 0.5) * 40;
+      
+      // We append to body for absolute positioning
+      float.style.left = (e.clientX + offsetX) + 'px';
+      float.style.top = (e.clientY + offsetY) + 'px';
+      
+      document.body.appendChild(float);
+      setTimeout(() => float.remove(), 1000);
     }
 
     function buyBusiness() { if (money >= businessPrice) { money -= businessPrice; businessCount++; calculateIncome(); updateUI(); } }
@@ -550,101 +520,236 @@
       }
     }
 
-    function buyStock(s) { 
-      if (money >= stockPrices[s]) { 
-        money -= stockPrices[s]; 
-        if(s==='wavyBank') wavyBankCount++; else if(s==='wavyCompany') wavyCompanyCount++; else if(s==='moonTech') moonTechCount++;
-        else if(s==='wavySpace') wavySpaceCount++; else if(s==='wavyEnergy') wavyEnergyCount++;
-        stockPrices[s] *= 1.05;
-        calculateIncome(); updateUI(); 
-      } 
-    }
-    function sellStock(s) {
-      const counts = { wavyBank: wavyBankCount, wavyCompany: wavyCompanyCount, moonTech: moonTechCount, wavySpace: wavySpaceCount, wavyEnergy: wavyEnergyCount };
-      if (counts[s] > 0) {
-        money += stockPrices[s];
-        if(s==='wavyBank') wavyBankCount--; else if(s==='wavyCompany') wavyCompanyCount--; else if(s==='moonTech') moonTechCount--;
-        else if(s==='wavySpace') wavySpaceCount--; else if(s==='wavyEnergy') wavyEnergyCount--;
-        calculateIncome(); updateUI();
+    function buyTech(t) {
+      if (!tech[t].owned && money >= tech[t].cost) {
+        money -= tech[t].cost;
+        tech[t].owned = true;
+        updateTechUI();
+        calculateIncome();
+        notify("Tech Acquired", `System upgraded.`, "positive");
       }
     }
-    function sellAllStocks() {
-      const val = (wavyBankCount*stockPrices.wavyBank)+(wavyCompanyCount*stockPrices.wavyCompany)+(moonTechCount*stockPrices.moonTech)+(wavySpaceCount*stockPrices.wavySpace)+(wavyEnergyCount*stockPrices.wavyEnergy);
-      money+=val; wavyBankCount=wavyCompanyCount=moonTechCount=wavySpaceCount=wavyEnergyCount=0; calculateIncome(); updateUI();
+
+    function updateTechUI() {
+      if(tech.quantum.owned) { let b = document.getElementById('btnTechQuantum'); b.disabled=true; b.innerHTML="<span>QUANTUM COOLING</span><span>[INSTALLED]</span>"; }
+      if(tech.aiTrader.owned) { let b = document.getElementById('btnTechAI'); b.disabled=true; b.innerHTML="<span>AI TRADER ALG.</span><span>[INSTALLED]</span>"; }
+      if(tech.firewall.owned) { let b = document.getElementById('btnTechFirewall'); b.disabled=true; b.innerHTML="<span>ICE FIREWALL</span><span>[INSTALLED]</span>"; }
     }
 
+    // --- Market Logic ---
+    function renderStockTable() {
+      const tbody = document.getElementById('stockTableBody');
+      tbody.innerHTML = '';
+      for(let key in stocks) {
+        const s = stocks[key];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div class="stock-symbol">${s.symbol}</div>
+            <div class="stock-name">${s.name}</div>
+          </td>
+          <td class="stock-price" id="price_${key}">C$${s.price.toFixed(2)}</td>
+          <td style="font-family:'Orbitron', sans-serif;" id="count_${key}">${s.count}</td>
+          <td>
+            <div class="action-group">
+              <button class="btn-mini buy" onclick="buyStock('${key}')">BUY</button>
+              <button class="btn-mini sell" onclick="sellStock('${key}')">SELL</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function simulateStocks() {
+      for (let key in stocks) {
+        const s = stocks[key];
+        const change = (Math.random() - 0.48) * (s.price * 0.05);
+        s.price = Math.max(1, s.price + change);
+        
+        const el = document.getElementById("price_" + key);
+        if(el) {
+          el.textContent = "C$" + s.price.toFixed(2);
+          el.style.textShadow = change > 0 ? "0 0 10px rgba(0,255,136,0.8)" : "0 0 10px rgba(255,42,42,0.8)";
+          el.style.color = change > 0 ? "#00ff88" : "#ff2a2a";
+          
+          setTimeout(() => {
+            el.style.textShadow = "var(--glow-primary)";
+            el.style.color = "var(--primary)";
+          }, 500);
+        }
+      }
+    }
+
+    function buyStock(s) { 
+      if (money >= stocks[s].price) { 
+        money -= stocks[s].price; 
+        stocks[s].count++;
+        stocks[s].price *= 1.05;
+        document.getElementById("count_"+s).textContent = stocks[s].count;
+        calculateIncome(); updateHeaderMoney(); 
+      } 
+    }
+    
+    function sellStock(s) {
+      if (stocks[s].count > 0) {
+        money += stocks[s].price;
+        stocks[s].count--;
+        document.getElementById("count_"+s).textContent = stocks[s].count;
+        calculateIncome(); updateHeaderMoney();
+      }
+    }
+    
+    function sellAllStocks() {
+      let val = 0;
+      for(let key in stocks) { val += stocks[key].count * stocks[key].price; stocks[key].count = 0; document.getElementById("count_"+key).textContent = 0; }
+      money += val; calculateIncome(); updateHeaderMoney();
+    }
+
+    // --- Events System ---
+    function notify(title, msg, type="neutral") {
+      const area = document.getElementById('notification-area');
+      const toast = document.createElement('div');
+      toast.className = `toast-msg ${type}`;
+      toast.innerHTML = `<div class="toast-title">${title}</div><div class="toast-body">${msg}</div>`;
+      area.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = "fadeOut 0.5s ease-out forwards";
+        setTimeout(() => toast.remove(), 500);
+      }, 5000);
+    }
+
+    function triggerRandomEvent() {
+      const r = Math.random();
+      const alertBadge = document.getElementById("eventAlert");
+      const incomeEl = document.getElementById("income");
+
+      if (r < 0.2) {
+        // Tech Boom
+        notify("Market Boom", "Tech sector rallies! Stock values +20%", "positive");
+        for(let key in stocks) stocks[key].price *= 1.20;
+      } 
+      else if (r < 0.4) {
+        // Network Surge
+        notify("Network Surge", "Production output +50% for 20s", "positive");
+        eventMultiplier = 1.5;
+        alertBadge.style.display = "inline"; alertBadge.style.color = "var(--success)"; alertBadge.textContent = "[SURGE]";
+        incomeEl.classList.add("val-success"); incomeEl.classList.remove("val-alert");
+        setTimeout(() => { eventMultiplier = 1; alertBadge.style.display="none"; calculateIncome(); }, 20000);
+      }
+      else if (r < 0.6) {
+        // Solar Flare (Negative)
+        if (tech.firewall.owned) {
+          notify("ICE Firewall Active", "Blocked a Solar Flare disturbance.", "positive");
+        } else {
+          notify("Solar Flare", "Interference detected. Output -50% for 20s", "negative");
+          eventMultiplier = 0.5;
+          alertBadge.style.display = "inline"; alertBadge.style.color = "var(--alert)"; alertBadge.textContent = "[ERROR]";
+          incomeEl.classList.add("val-alert"); incomeEl.classList.remove("val-success");
+          setTimeout(() => { 
+            eventMultiplier = 1; alertBadge.style.display="none"; 
+            incomeEl.classList.remove("val-alert"); incomeEl.classList.add("val-success");
+            calculateIncome(); 
+          }, 20000);
+        }
+      }
+      else if (r < 0.7) {
+        // Market Crash
+        if (tech.firewall.owned) {
+          notify("ICE Firewall Active", "Prevented data loss during Market Crash.", "positive");
+        } else {
+          notify("Market Crash", "Panic selling! Stock values -30%", "negative");
+          for(let key in stocks) stocks[key].price *= 0.70;
+        }
+      }
+    }
+
+    // --- UI & Save ---
     function updateUI() {
-      document.getElementById("income").textContent = income.toLocaleString(undefined, {minimumFractionDigits: 2});
       document.getElementById("upgradeLevel").textContent = upgradeLevel;
-      document.getElementById("miningLevelDisplay").textContent = upgradeLevel;
       document.getElementById("miningMultDisplay").textContent = Math.pow(2, upgradeLevel - 1);
       document.getElementById("upgradeCostDisplay").textContent = upgradeCost.toLocaleString();
       document.getElementById("businessCount").textContent = businessCount;
       document.getElementById("propertyCount").textContent = propertyCount;
-      document.getElementById("wavyBankCount").textContent = wavyBankCount;
-      document.getElementById("wavyCompanyCount").textContent = wavyCompanyCount;
-      document.getElementById("moonTechCount").textContent = moonTechCount;
-      document.getElementById("wavySpaceCount").textContent = wavySpaceCount;
-      document.getElementById("wavyEnergyCount").textContent = wavyEnergyCount;
 
-      const details = document.getElementById("income-details");
-      const mult = Math.pow(2, upgradeLevel-1);
-      details.innerHTML = `Base Profit: $${(( (businessCount*businessPrice*0.01) + (propertyCount*propertyPrice*0.015) )*mult).toFixed(2)}/s<br>Stock Yield: $${(( (wavyBankCount*stockPrices.wavyBank*0.005)+(wavyCompanyCount*stockPrices.wavyCompany*0.005)+(moonTechCount*stockPrices.moonTech*0.005)+(wavySpaceCount*stockPrices.wavySpace*0.005)+(wavyEnergyCount*stockPrices.wavyEnergy*0.005) )*mult).toFixed(2)}/s`;
-      
       updateLeaderboard();
     }
 
     function updateLeaderboard() {
-      const total = money + (businessCount*50) + (propertyCount*200) + (wavyBankCount*stockPrices.wavyBank) + (wavyCompanyCount*stockPrices.wavyCompany) + (moonTechCount*stockPrices.moonTech) + (wavySpaceCount*stockPrices.wavySpace) + (wavyEnergyCount*stockPrices.wavyEnergy);
+      let totalStockVal = 0;
+      for(let key in stocks) totalStockVal += stocks[key].count * stocks[key].price;
+      
+      const total = money + (businessCount*50) + (propertyCount*200) + totalStockVal;
       let list = leaderboard.filter(p => p.name !== playerName);
       list.push({ name: playerName, asset: total });
       list.sort((a,b) => b.asset - a.asset);
       const b = document.getElementById("leaderboardBody"); b.innerHTML = "";
       list.slice(0,10).forEach((p,i) => {
-        const tr = document.createElement("tr"); if(p.name===playerName) tr.className="highlight";
-        tr.innerHTML = `<td>${i+1}</td><td>${p.name}</td><td class="text-end">$${p.asset.toLocaleString()}</td>`;
-        b.appendChild(tr);
+        const div = document.createElement("div"); 
+        div.className = "rank-row" + (p.name === playerName ? " highlight" : "");
+        div.innerHTML = `
+          <div style="font-family:'Orbitron', sans-serif;">
+            <span style="opacity:0.5; margin-right:10px;">${(i+1).toString().padStart(2, '0')}</span>
+            ${p.name}
+          </div>
+          <div style="color:var(--primary); font-family:'Orbitron', sans-serif; text-shadow:var(--glow-primary);">C$${p.asset.toLocaleString(undefined,{maximumFractionDigits:0})}</div>
+        `;
+        b.appendChild(div);
       });
     }
 
     function saveGame() {
-      const state = { money, businessCount, propertyCount, upgradeLevel, upgradeCost, wavyBankCount, wavyCompanyCount, moonTechCount, wavySpaceCount, wavyEnergyCount, stockPrices };
-      localStorage.setItem('wavyTycoonFullRestore', JSON.stringify(state));
+      const state = { money, businessCount, propertyCount, upgradeLevel, upgradeCost, stocks, tech };
+      localStorage.setItem('anmumCoreV2', JSON.stringify(state));
     }
+    
     function loadGame() {
-      const s = localStorage.getItem('wavyTycoonFullRestore');
+      const s = localStorage.getItem('anmumCoreV2');
       if(s) {
         const d = JSON.parse(s);
-        money=d.money; businessCount=d.businessCount; propertyCount=d.propertyCount; upgradeLevel=d.upgradeLevel; upgradeCost=d.upgradeCost;
-        wavyBankCount=d.wavyBankCount; wavyCompanyCount=d.wavyCompanyCount; moonTechCount=d.moonTechCount; wavySpaceCount=d.wavySpaceCount; wavyEnergyCount=d.wavyEnergyCount;
-        if(d.stockPrices) stockPrices=d.stockPrices;
+        money=d.money||1000; businessCount=d.businessCount||0; propertyCount=d.propertyCount||0; 
+        upgradeLevel=d.upgradeLevel||1; upgradeCost=d.upgradeCost||500;
+        if(d.stocks) {
+          for(let k in d.stocks) {
+            if(stocks[k]) { stocks[k].count = d.stocks[k].count; stocks[k].price = d.stocks[k].price; }
+          }
+        }
+        if(d.tech) tech = d.tech;
       }
     }
-    function resetGame() { localStorage.removeItem('wavyTycoonFullRestore'); location.reload(); }
+    
+    function resetGame() { localStorage.removeItem('anmumCoreV2'); location.reload(); }
 
-    function toggleCalc() { const e = document.getElementById('calc-floating'); e.style.display = e.style.display==='block' ? 'none' : 'block'; }
-    function calculateCompound() {
-      const P=parseFloat(document.getElementById('calc-p').value)||0, r=(parseFloat(document.getElementById('calc-r').value)||0)/100, t=parseFloat(document.getElementById('calc-t').value)||0, n=parseFloat(document.getElementById('calc-n').value)||1;
-      const A = P * Math.pow((1 + r/n), (n*t));
-      document.getElementById('calc-res').textContent = A.toLocaleString(undefined, {minimumFractionDigits:2});
-    }
-
-    let mainChart, growthChart;
+    // --- Chart ---
+    let mainChart;
     function setupCharts() {
-      const c1 = document.getElementById('mainChart').getContext('2d'), c2 = document.getElementById('growthChart').getContext('2d');
-      mainChart = new Chart(c1, { type:'line', data:{ labels:[], datasets:[{label:'Income', data:[], borderColor:'#00f2ff', tension:0.4}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,0.05)'}}} } });
-      growthChart = new Chart(c2, { type:'line', data:{ labels:[], datasets:[{label:'Assets', data:[], borderColor:'#7000ff', fill:true, backgroundColor:'rgba(112,0,255,0.1)', tension:0.4}] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,0.05)'}}} } });
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+      gradient.addColorStop(0, 'rgba(0, 243, 255, 0.5)');
+      gradient.addColorStop(1, 'rgba(0, 243, 255, 0.0)');
+
+      mainChart = new Chart(ctx, { 
+        type: 'line', 
+        data: { 
+          labels: Array(20).fill(''), 
+          datasets: [{ label: 'Net/Sec', data: Array(20).fill(0), borderColor: '#00f3ff', backgroundColor: gradient, borderWidth: 2, pointRadius: 0, fill: true, tension: 0.4 }] 
+        }, 
+        options: { 
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, 
+          scales: { x: { display: false }, y: { display: true, grid: { color: 'rgba(0,243,255,0.1)' }, border: { dash: [5, 5] }, ticks: { maxTicksLimit: 5 } } },
+          animation: { duration: 0 }
+        } 
+      });
     }
+    
     function updateChartsData() {
       const time = new Date().toLocaleTimeString();
-      const total = money + (businessCount*50) + (propertyCount*200) + (wavyBankCount*stockPrices.wavyBank) + (wavyCompanyCount*stockPrices.wavyCompany) + (moonTechCount*stockPrices.moonTech) + (wavySpaceCount*stockPrices.wavySpace) + (wavyEnergyCount*stockPrices.wavyEnergy);
-      if(mainChart.data.labels.length > 15) { mainChart.data.labels.shift(); mainChart.data.datasets[0].data.shift(); growthChart.data.labels.shift(); growthChart.data.datasets[0].data.shift(); }
+      if(mainChart.data.labels.length > 20) { mainChart.data.labels.shift(); mainChart.data.datasets[0].data.shift(); }
       mainChart.data.labels.push(time); mainChart.data.datasets[0].data.push(income); mainChart.update();
-      growthChart.data.labels.push(time); growthChart.data.datasets[0].data.push(total); growthChart.update();
     }
 
     init();
   </script>
 </body>
-
 </html>
