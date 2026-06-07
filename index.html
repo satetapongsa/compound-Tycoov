@@ -694,7 +694,7 @@
 
     let eventMultiplier = 1;
 
-    const playerName = "PRIMARY_CORP";
+    const playerName = "Anmum Corporation";
     let leaderboard = [
       { name: "Vanguard Asset Mgmt", factor: 15.0, base: 12000000 }, 
       { name: "BlackRock Inv.", factor: 8.5, base: 5000000 },
@@ -909,7 +909,7 @@
       const prestigeMult = 1 + (prestige.upgrades.opLeverage || 0);
       
       income = (baseYieldTotal + dividends) * eventMultiplier * prestigeMult;
-      document.getElementById("income").textContent = (income >= 0 ? "+" : "") + formatNumber(income);
+      document.getElementById("income").textContent = (income >= 0 ? "+" : "") + formatNumber(income) + "/s";
     }
 
     function buyAsset(key) {
@@ -1225,22 +1225,43 @@
       updateLeaderboard();
     }
 
+    function getCompetitors() {
+      const prefixes = ["Vanguard", "BlackRock", "Citadel", "Stripe", "Apex", "Fidelity", "Jane Street", "Point72", "Bridgewater", "Renaissance", "Two Sigma", "Millennium", "Man Group", "AQR", "Marshall Wace", "Wellington", "Schroders", "Invesco", "Franklin", "Lazard", "Guggenheim", "AllianceBernstein", "Neuberger", "Baillie Gifford", "BlueCrest", "Brevan Howard", "Tudor", "Caxton", "Moore", "Balyasny", "ExodusPoint", "Verition", "Citigroup", "JPMorgan", "Goldman Sachs", "Morgan Stanley", "Merrill", "Barclays", "UBS", "Deutsche", "HSBC", "BNP Paribas", "Nomura", "Blackstone", "KKR", "Carlyle", "Warburg", "Sequoia", "Andreessen", "Benchmark"];
+      const suffixes = ["Capital", "Investments", "Asset Mgmt", "Holdings", "Partners", "Advisors", "Group", "Global", "Systems", "Technologies", "Ventures", "Fund", "Securities", "Wealth", "Alpha", "Nexus", "Equities", "Trust", "Alpha Solutions", "Financial"];
+      
+      let comps = [];
+      for (let i = 1; i <= 98; i++) {
+        // Deterministic name based on index
+        const pIndex = (i * 7) % prefixes.length;
+        const sIndex = (i * 13) % suffixes.length;
+        let name = `${prefixes[pIndex]} ${suffixes[sIndex]}`;
+        if (comps.some(c => c.name === name)) {
+          name += ` ${Math.floor(i / 10) + 1}`;
+        }
+        
+        // Exponential scale: i=1 is Rank 1 (95 Qi / 95e18), i=98 is Rank 98 (100,000)
+        const targetExponent = Math.log10(95e18);
+        const exponent = targetExponent - ((i - 1) / 97) * (targetExponent - 5);
+        const baseAsset = Math.pow(10, exponent);
+        
+        // Minor dynamic fluctuation over time
+        const variance = 0.98 + (Math.sin(Date.now() / 60000 + i) * 0.02);
+        comps.push({ name, asset: baseAsset * variance });
+      }
+      return comps;
+    }
+
     function updateLeaderboard() {
       const total = calculateTotalAssets();
-      let list = [];
-      
-      leaderboard.forEach(c => {
-        // Dynamic fluctuation over time to make it feel alive (+-5% variance)
-        const variance = 0.95 + (Math.sin(Date.now() / 60000 + c.name.length) * 0.05);
-        const dynamicAsset = Math.max(c.base, total * c.factor * variance);
-        list.push({ name: c.name, asset: dynamicAsset });
-      });
+      let list = getCompetitors();
       
       list.push({ name: playerName, asset: total });
       list.sort((a,b) => b.asset - a.asset);
-      const b = document.getElementById("leaderboardBody"); b.innerHTML = "";
       
-      list.slice(0, 10).forEach((p, i) => {
+      const b = document.getElementById("leaderboardBody"); 
+      b.innerHTML = "";
+      
+      list.forEach((p, i) => {
         const div = document.createElement("div"); 
         div.className = "ledger-row" + (p.name === playerName ? " highlight" : "");
         div.innerHTML = `
@@ -1317,8 +1338,19 @@
     }
     
     function resetGame() { 
+      document.getElementById('resetConfirmModal').style.display = 'flex';
+    }
+
+    function closeResetConfirmModal() {
+      document.getElementById('resetConfirmModal').style.display = 'none';
+    }
+
+    function executeResetGame() {
       localStorage.removeItem('anmumCoreV3'); 
       localStorage.removeItem('anmumCoreV2'); 
+      // Ensure starting money is set to 2000 explicitly
+      const defaultState = { money: 2000 };
+      localStorage.setItem('anmumCoreV3', JSON.stringify(defaultState));
       location.reload(); 
     }
 
@@ -1363,6 +1395,20 @@
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
         <button class="btn btn-secondary" onclick="closeConfirmModal()" style="width: auto; padding: 6px 12px; font-size: 0.78rem;">Cancel</button>
         <button class="btn btn-danger" onclick="executeLiquidation()" style="width: auto; padding: 6px 16px; font-size: 0.78rem;">Confirm Sell</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Reset Confirm Modal -->
+  <div id="resetConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center;">
+    <div class="card" style="width: 380px; padding: 24px; border: 1px solid var(--card-border); background: var(--card-bg); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); gap: 16px;">
+      <div style="font-size: 0.95rem; font-weight: 600; color: #fff;">Confirm Account Reset</div>
+      <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; margin: 8px 0 12px 0;">
+        Are you sure you want to delete all play data and start over? All your progress will be lost. Your starting balance will be reset to C$2,000.00.
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn btn-secondary" onclick="closeResetConfirmModal()" style="width: auto; padding: 6px 12px; font-size: 0.78rem;">Cancel</button>
+        <button class="btn btn-danger" onclick="executeResetGame()" style="width: auto; padding: 6px 16px; font-size: 0.78rem;">Confirm Reset</button>
       </div>
     </div>
   </div>
