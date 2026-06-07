@@ -706,21 +706,26 @@
 
     const playerName = "PRIMARY_CORP";
     let leaderboard = [
-      { name: "Anmum Global", asset: 999999999999 }, { name: "Vanguard Asset Management", asset: 512456793 },
-      { name: "BlackRock Inv.", asset: 412546379 }, { name: "Stripe Ledger Co.", asset: 354976123 },
-      { name: "Apex Capital", asset: 254976124 }, { name: "Fidelity Dev", asset: 1200000 },
-      { name: "Citadel LLC", asset: 800000 }, { name: "Jane Street Systems", asset: 450000 }
+      { name: "Vanguard Asset Mgmt", factor: 15.0, base: 12000000 }, 
+      { name: "BlackRock Inv.", factor: 8.5, base: 5000000 },
+      { name: "Citadel LLC", factor: 3.2, base: 1000000 }, 
+      { name: "Stripe Ledger Co.", factor: 1.8, base: 450000 },
+      { name: "Apex Capital", factor: 0.85, base: 120000 }, 
+      { name: "Fidelity Dev", factor: 0.45, base: 50000 },
+      { name: "Jane Street Systems", factor: 0.25, base: 20000 },
+      { name: "Point72 Capital", factor: 0.12, base: 5000 }
     ];
 
     Chart.defaults.color = 'rgba(255, 255, 255, 0.4)';
     Chart.defaults.font.family = 'Inter';
     Chart.defaults.font.size = 10;
-    
+
     // --- Metric Number Formatter ---
     function formatNumber(num) {
       if (num === null || num === undefined || isNaN(num)) return "0.00";
+      if (num === Infinity) return "∞";
       if (num < 1000) return num.toFixed(2);
-      const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+      const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc", "UDc", "DDc", "TDc", "QaDc", "QiDc", "SxDc", "SpDc", "OcDc", "NoDc", "Vg"];
       const i = Math.floor(Math.log10(num) / 3);
       if (i >= suffixes.length) return num.toExponential(2);
       const formatted = (num / Math.pow(10, i * 3)).toFixed(2);
@@ -1275,7 +1280,15 @@
 
     function updateLeaderboard() {
       const total = calculateTotalAssets();
-      let list = leaderboard.filter(p => p.name !== playerName);
+      let list = [];
+      
+      leaderboard.forEach(c => {
+        // Dynamic fluctuation over time to make it feel alive (+-5% variance)
+        const variance = 0.95 + (Math.sin(Date.now() / 60000 + c.name.length) * 0.05);
+        const dynamicAsset = Math.max(c.base, total * c.factor * variance);
+        list.push({ name: c.name, asset: dynamicAsset });
+      });
+      
       list.push({ name: playerName, asset: total });
       list.sort((a,b) => b.asset - a.asset);
       const b = document.getElementById("leaderboardBody"); b.innerHTML = "";
